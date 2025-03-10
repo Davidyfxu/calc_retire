@@ -1,9 +1,31 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Form, InputNumber, Select, Button, Card, Row, Col, Statistic, Divider, Alert, Table, Tooltip } from 'antd';
-import { InfoCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useState } from "react";
+import {
+  Form,
+  InputNumber,
+  Select,
+  Button,
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Divider,
+  Alert,
+  Table,
+  Tooltip,
+} from "antd";
+import { InfoCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const { Option } = Select;
 
@@ -53,28 +75,31 @@ const DelayedRetirementAnalysis = () => {
   const calculateRetirementAge = (values: any) => {
     const { age, gender, employeeType, birthYear } = values;
     const currentYear = new Date().getFullYear();
-    
+
     // 计算正常退休年龄
     let standardRetirementAge;
-    if (gender === 'male') {
+    if (gender === "male") {
       standardRetirementAge = MALE_RETIREMENT_AGE;
     } else {
-      standardRetirementAge = employeeType === 'cadre' ? FEMALE_CADRE_RETIREMENT_AGE : FEMALE_RETIREMENT_AGE;
+      standardRetirementAge =
+        employeeType === "cadre"
+          ? FEMALE_CADRE_RETIREMENT_AGE
+          : FEMALE_RETIREMENT_AGE;
     }
-    
+
     // 计算正常退休年份
     const standardRetirementYear = birthYear + standardRetirementAge;
-    
+
     // 根据延迟退休政策计算实际退休年龄
     let actualRetirementAge = standardRetirementAge;
     let actualRetirementYear = standardRetirementYear;
-    
+
     // 找到对应的延迟退休政策
     for (const policy of DELAYED_RETIREMENT_POLICY) {
       if (policy.year >= standardRetirementYear) {
-        if (gender === 'male') {
+        if (gender === "male") {
           actualRetirementAge = policy.maleAge;
-        } else if (employeeType === 'cadre') {
+        } else if (employeeType === "cadre") {
           actualRetirementAge = policy.femaleCadreAge;
         } else {
           actualRetirementAge = policy.femaleAge;
@@ -83,29 +108,29 @@ const DelayedRetirementAnalysis = () => {
         break;
       }
     }
-    
+
     // 计算延迟退休年数
     const delayedYears = actualRetirementAge - standardRetirementAge;
-    
+
     // 计算距离退休还有多少年
     const yearsToRetirement = actualRetirementYear - currentYear;
-    
+
     // 计算退休金增加比例（假设每延迟1年，退休金增加3%）
     const pensionIncreaseRate = delayedYears * 3;
-    
+
     // 生成图表数据 - 未来10年的退休年龄变化趋势
     const chartData = [];
     for (let i = 0; i < 10; i++) {
       const year = currentYear + i;
       const ageInThatYear = age + i;
-      
+
       // 找到对应年份的退休政策
       let retirementAgeInThatYear;
       for (const policy of DELAYED_RETIREMENT_POLICY) {
         if (policy.year >= year) {
-          if (gender === 'male') {
+          if (gender === "male") {
             retirementAgeInThatYear = policy.maleAge;
-          } else if (employeeType === 'cadre') {
+          } else if (employeeType === "cadre") {
             retirementAgeInThatYear = policy.femaleCadreAge;
           } else {
             retirementAgeInThatYear = policy.femaleAge;
@@ -113,14 +138,14 @@ const DelayedRetirementAnalysis = () => {
           break;
         }
       }
-      
+
       chartData.push({
         year,
         退休年龄: retirementAgeInThatYear,
         您的年龄: ageInThatYear,
       });
     }
-    
+
     return {
       standardRetirementAge,
       standardRetirementYear,
@@ -135,7 +160,7 @@ const DelayedRetirementAnalysis = () => {
 
   const handleSubmit = (values: any) => {
     setLoading(true);
-    
+
     // 模拟计算延迟
     setTimeout(() => {
       try {
@@ -144,7 +169,7 @@ const DelayedRetirementAnalysis = () => {
         setChartData(result.chartData);
         setLoading(false);
       } catch (error) {
-        console.error('计算错误:', error);
+        console.error("计算错误:", error);
         setLoading(false);
       }
     }, 500);
@@ -153,24 +178,24 @@ const DelayedRetirementAnalysis = () => {
   // 表格列定义
   const columns = [
     {
-      title: '年份',
-      dataIndex: 'year',
-      key: 'year',
+      title: "年份",
+      dataIndex: "year",
+      key: "year",
     },
     {
-      title: '男性退休年龄',
-      dataIndex: 'maleAge',
-      key: 'maleAge',
+      title: "男性退休年龄",
+      dataIndex: "maleAge",
+      key: "maleAge",
     },
     {
-      title: '女性退休年龄',
-      dataIndex: 'femaleAge',
-      key: 'femaleAge',
+      title: "女性退休年龄",
+      dataIndex: "femaleAge",
+      key: "femaleAge",
     },
     {
-      title: '女干部退休年龄',
-      dataIndex: 'femaleCadreAge',
-      key: 'femaleCadreAge',
+      title: "女干部退休年龄",
+      dataIndex: "femaleCadreAge",
+      key: "femaleCadreAge",
     },
   ];
 
@@ -183,7 +208,7 @@ const DelayedRetirementAnalysis = () => {
           type="info"
           showIcon
           icon={<InfoCircleOutlined />}
-          className="mb-6"
+          style={{ marginBottom: 16 }}
         />
 
         <Form
@@ -192,8 +217,8 @@ const DelayedRetirementAnalysis = () => {
           onFinish={handleSubmit}
           initialValues={{
             age: 35,
-            gender: 'male',
-            employeeType: 'worker',
+            gender: "male",
+            employeeType: "worker",
             birthYear: 1990,
           }}
         >
@@ -202,7 +227,7 @@ const DelayedRetirementAnalysis = () => {
               <Form.Item
                 label="当前年龄"
                 name="age"
-                rules={[{ required: true, message: '请输入您的年龄' }]}
+                rules={[{ required: true, message: "请输入您的年龄" }]}
               >
                 <InputNumber min={18} max={60} className="w-full" />
               </Form.Item>
@@ -211,7 +236,7 @@ const DelayedRetirementAnalysis = () => {
               <Form.Item
                 label="出生年份"
                 name="birthYear"
-                rules={[{ required: true, message: '请输入您的出生年份' }]}
+                rules={[{ required: true, message: "请输入您的出生年份" }]}
               >
                 <InputNumber min={1950} max={2010} className="w-full" />
               </Form.Item>
@@ -220,7 +245,7 @@ const DelayedRetirementAnalysis = () => {
               <Form.Item
                 label="性别"
                 name="gender"
-                rules={[{ required: true, message: '请选择您的性别' }]}
+                rules={[{ required: true, message: "请选择您的性别" }]}
               >
                 <Select>
                   <Option value="male">男</Option>
@@ -232,14 +257,14 @@ const DelayedRetirementAnalysis = () => {
               <Form.Item
                 label={
                   <span>
-                    职工类型 
+                    职工类型
                     <Tooltip title="干部指行政事业单位工作人员，工人指企业职工">
                       <QuestionCircleOutlined className="ml-1" />
                     </Tooltip>
                   </span>
                 }
                 name="employeeType"
-                rules={[{ required: true, message: '请选择您的职工类型' }]}
+                rules={[{ required: true, message: "请选择您的职工类型" }]}
               >
                 <Select>
                   <Option value="cadre">干部</Option>
@@ -250,7 +275,12 @@ const DelayedRetirementAnalysis = () => {
           </Row>
 
           <Form.Item className="text-center mt-4">
-            <Button type="primary" htmlType="submit" loading={loading} size="large">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              size="large"
+            >
               分析延迟退休情况
             </Button>
           </Form.Item>
@@ -282,7 +312,9 @@ const DelayedRetirementAnalysis = () => {
                   title="延迟退休年数"
                   value={result.delayedYears}
                   suffix="年"
-                  valueStyle={{ color: result.delayedYears > 0 ? '#faad14' : '#52c41a' }}
+                  valueStyle={{
+                    color: result.delayedYears > 0 ? "#faad14" : "#52c41a",
+                  }}
                   className="text-center"
                 />
               </Col>
@@ -304,10 +336,11 @@ const DelayedRetirementAnalysis = () => {
                 value={result.pensionIncreaseRate}
                 precision={1}
                 suffix="%"
-                valueStyle={{ color: '#3f8600' }}
+                valueStyle={{ color: "#3f8600" }}
               />
               <div className="mt-2 text-gray-500 text-sm">
-                根据当前政策估算，延迟退休{result.delayedYears}年可能使您的退休金增加约{result.pensionIncreaseRate}%
+                根据当前政策估算，延迟退休{result.delayedYears}
+                年可能使您的退休金增加约{result.pensionIncreaseRate}%
               </div>
             </div>
 
@@ -324,7 +357,12 @@ const DelayedRetirementAnalysis = () => {
                   <YAxis />
                   <RechartsTooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="退休年龄" stroke="#1677ff" activeDot={{ r: 8 }} />
+                  <Line
+                    type="monotone"
+                    dataKey="退休年龄"
+                    stroke="#1677ff"
+                    activeDot={{ r: 8 }}
+                  />
                   <Line type="monotone" dataKey="您的年龄" stroke="#52c41a" />
                 </LineChart>
               </ResponsiveContainer>
@@ -332,9 +370,11 @@ const DelayedRetirementAnalysis = () => {
           </Card>
 
           <Card title="延迟退休政策趋势表" className="mb-6">
-            <Table 
-              dataSource={DELAYED_RETIREMENT_POLICY.filter(p => p.year >= new Date().getFullYear())} 
-              columns={columns} 
+            <Table
+              dataSource={DELAYED_RETIREMENT_POLICY.filter(
+                (p) => p.year >= new Date().getFullYear(),
+              )}
+              columns={columns}
               rowKey="year"
               pagination={{ pageSize: 10 }}
               size="middle"
